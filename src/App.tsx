@@ -1,5 +1,7 @@
 import { useAuth } from "./auth/useAuth"
+import DraggableButton from "./components/DraggableButton"
 import NaverSmokingMap from "./components/NaverSmokingMap"
+
 
 export default function App() {
   const { user, loading, error, login, logout } = useAuth()
@@ -37,6 +39,7 @@ export default function App() {
   return (
     <div style={{ position: "relative" }}>
       <NaverSmokingMap />
+      <DraggableButton />
 
       {/* 로그인 바 (오버레이) */}
       <div style={{ position: "absolute", top: 12, left: 12, display: "flex", gap: 10, alignItems: "center" }}>

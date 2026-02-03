@@ -4,6 +4,7 @@ import { fetchAllPages } from "../lib/odcloud"
 import type { Spot } from "../lib/normalize"
 import { normalize } from "../lib/normalize"
 import { getCurrentLatLng, reverseGeocodeToGu } from "../lib/location"
+import ReviewPanel from "../components/ReviewPanel"
 
 type GuConfig = { gu: string; url: string; normalize: (row: any) => Spot }
 
@@ -24,8 +25,8 @@ const GU_CONFIGS: GuConfig[] = [
   { gu: "중랑구", url: "https://api.odcloud.kr/api/15040636/v1/uddi:dc7ed6ee-001f-4312-a75a-ed408fd01f62?page=1&perPage=10", normalize: normalize.jungnang },
 ]
 
-const DEFAULT_CENTER = { lat: 37.5665, lng: 126.978 }
-const DEFAULT_GU = "중구"
+const DEFAULT_CENTER = { lat: 37.565, lng: 126.931 }
+const DEFAULT_GU = "서대문구"
 
 // 네이버 지도 URL Scheme: appname 필수 [web:110]
 const APPNAME = "smokespot-web"
@@ -79,7 +80,7 @@ function buildPrettyHtml(spot: Spot) {
         ${rows || `<div style="color:#64748b; font-size:12px;">표시할 데이터가 없어요.</div>`}
       </div>
       <div style="padding:10px 14px; background:#f8fafc; border-top:1px solid #e2e8f0; font-size:11px; color:#64748b;">
-        마커를 다시 누르면 닫혀요.
+        지도를 누르면 닫혀요.
       </div>
     </div>
   `
@@ -170,6 +171,8 @@ export default function NaverSmokingMap() {
 
   const serviceKey = useMemo(() => import.meta.env.VITE_DATA_GO_KR_SERVICE_KEY as string, [])
   const geocodeCacheRef = useRef<Map<string, { lat: number; lng: number }>>(new Map())
+
+  const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null)
 
   function setOrMoveMyMarker(naver: any, latlng: { lat: number; lng: number }) {
     const pos = new naver.maps.LatLng(latlng.lat, latlng.lng)
@@ -267,6 +270,7 @@ export default function NaverSmokingMap() {
       if (!iw) return
       iw.setContent(buildPrettyHtml(spot))
       iw.open(mapRef.current, marker)
+      setSelectedSpot({...spot})
     })
 
     markersRef.current.push(marker)
@@ -404,6 +408,7 @@ export default function NaverSmokingMap() {
 
           naver.maps.Event.addListener(mapRef.current, "click", () => {
             if (infoWindowRef.current?.getMap()) infoWindowRef.current.close()
+            setSelectedSpot(null) // 후기 패널 닫기
           })
 
           infoWindowRef.current = new naver.maps.InfoWindow({ maxWidth: 340 })
@@ -417,10 +422,11 @@ export default function NaverSmokingMap() {
 
         // 내 위치
         let latlng = DEFAULT_CENTER
-        try {
-          latlng = await getCurrentLatLng()
-        } catch {}
-        if (cancelled) return
+        // try {
+        //   latlng = await getCurrentLatLng()
+        // } catch {}
+        // if (cancelled) return
+        // 위 4줄 주석 풀면 현재 위치로 로딩되고 주석하면 DEFAULT_CENTER로 로딩
 
         setMyLatLng(latlng)
         mapRef.current.setCenter(new naver.maps.LatLng(latlng.lat, latlng.lng))
@@ -542,6 +548,13 @@ export default function NaverSmokingMap() {
           </div>
         </div>
       )}
+      {selectedSpot && (
+        <ReviewPanel spot={selectedSpot} onClose={() => setSelectedSpot(null)} />
+      )}
+
     </div>
+    
   )
+  
 }
+
