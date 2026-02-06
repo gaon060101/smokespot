@@ -7,6 +7,10 @@ export async function fetchAllPages<T>(
   url1.searchParams.set("page", "1")
   url1.searchParams.set("perPage", String(perPage))
   url1.searchParams.set("serviceKey", serviceKey)
+  console.log("ODcloud serviceKey len", serviceKey?.length)
+  console.log("ODcloud URL raw", url1.toString())
+  console.log("ODcloud URL bytes", Array.from(url1.toString()).slice(-80)) // 끝부분에 이상문자 있는지
+
 
   const r1 = await fetch(url1.toString())
   if (!r1.ok) throw new Error(`ODcloud fetch failed: ${r1.status}`)

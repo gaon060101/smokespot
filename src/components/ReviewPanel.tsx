@@ -20,7 +20,7 @@ function StarsView({ value }: { value: number }) {
   )
 }
 
-export default function ReviewPanel({ spot, onClose }: { spot: Spot; onClose: () => void }) {
+export default function ReviewPanel({ spot}: { spot: Spot; onClose: () => void }) {
   const [rating, setRating] = useState(5)
   const [hover, setHover] = useState<number | null>(null)
   const [text, setText] = useState("")
