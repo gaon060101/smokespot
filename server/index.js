@@ -105,6 +105,8 @@ app.post("/api/gemini", async (req, res) => {
 })
 
 const port = Number(process.env.PORT ?? 8787)
-app.listen(port, "127.0.0.1", () => {
-  console.log(`API server running on http://127.0.0.1:${port}`)
+
+app.listen(port, "0.0.0.0", () => {
+  console.log(`API server running on port ${port}`)
 })
+
